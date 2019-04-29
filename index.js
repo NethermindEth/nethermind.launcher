@@ -31,15 +31,14 @@ const options = [{
     message: 'Select sync',
     choices: ['Fast sync', 'Full archive'],
     filter: function(value) {
-      return value.toLowerCase();
+      return value === 'Fast sync' ? '' : '_archive';
     }
   }
 ];
 
 inquirer.prompt(options).then(o => {
-  const config = `${o.config}`;
-  const fastSync = o.sync === 'fast sync';
-  startProcess(runner, ['--config', config, '--SyncConfig.FastSync', fastSync]);
+  const config = `${o.config}${o.sync}`;
+  startProcess(runner, ['--config', config]);
 });
 
 function startProcess(name, args) {
