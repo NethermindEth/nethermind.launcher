@@ -2,19 +2,39 @@ const inquirer = require('inquirer');
 const spawn = require('cross-spawn');
 const {platform} = require('os');
 const osType = platform();
+
+const applications = {
+  runner: 'Nethermind.Runner',
+  cli: 'Nethermind.Cli',
+}
+
 let runner = 'Nethermind.Runner';
 
 switch (osType) {
   case 'linux':
-    runner = `./${runner}`;
+    applications.runner = `./${applications.runner}`;
+    applications.cli = `./${applications.cli}`;
     break;
   case 'darwin':
-    runner = `./${runner}`;
+    applications.runner = `./${applications.runner}`;
+    applications.cli = `./${applications.cli}`;
     break;
   case 'win32':
-    runner = `${runner}.exe`;
+    applications.runner = `${applications.runner}.exe`;
+    applications.cli = `./${applications.cli}.exe`;
     break;
 }
+
+const mainOptions = [{
+    type: 'list',
+    name: 'mainConfig',
+    message: 'Start Nethermind',
+    choices: ['Node', 'CLI'],
+    filter: function(value) {
+      return value.toLowerCase();
+    }
+  }
+];
 
 const options = [{
     type: 'list',
@@ -36,9 +56,15 @@ const options = [{
   }
 ];
 
-inquirer.prompt(options).then(o => {
-  const config = `${o.config}${o.sync}`;
-  startProcess(runner, ['--config', config]);
+inquirer.prompt(mainOptions).then(o => {
+  if (o.mainConfig === 'cli') {
+    startProcess(applications.cli, []);
+    return;
+  }
+  inquirer.prompt(options).then(o => {
+      const config = `${o.config}${o.sync}`;
+      startProcess(applications.runner, ['--config', config]);
+  });
 });
 
 function startProcess(name, args) {
