@@ -40,7 +40,7 @@ const options = [{
     type: 'list',
     name: 'config',
     message: 'Select network',
-    choices: ['Goerli', 'Mainnet', 'Rinkeby', 'Ropsten'],
+    choices: ['Goerli', 'Mainnet', 'Rinkeby', 'Ropsten', 'xDai', 'Poacore'],
     filter: function(value) {
       return value.toLowerCase();
     }
