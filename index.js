@@ -67,11 +67,11 @@ const ethStatsEnabled = [{
 ]
 
 const ethStatsOptions = [
-  {
-   type: 'input',
-   name: 'Server',
-   message: 'What is the ethStats WebSocket address (this is a WebSocket address that you can obtain from Core Devs, depends on chain selected)?'
-  },
+  // {
+  //  type: 'input',
+  //  name: 'Server',
+  //  message: 'What is the ethStats WebSocket address (this is a WebSocket address that you can obtain from Core Devs, depends on chain selected)?'
+  // },
   {
     type: 'input',
     name: 'Name',
