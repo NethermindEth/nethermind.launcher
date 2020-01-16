@@ -67,12 +67,11 @@ const ethStatsEnabled = [{
 ]
 
 const ethStatsOptions = [
-  //{
-  //  type: 'input',
-  //  name: 'Server',
-  //  message: 'What is the ethStats WebSocket address (this is a WebSocket address that you can obtain from Core Devs, depends on chain selected)?',
-  //  default: 'wss://ethstats.net/api'
-  //},
+  {
+   type: 'input',
+   name: 'Server',
+   message: 'What is the ethStats WebSocket address (this is a WebSocket address that you can obtain from Core Devs, depends on chain selected)?'
+  },
   {
     type: 'input',
     name: 'Name',
@@ -122,6 +121,11 @@ inquirer.prompt(mainOptions).then(o => {
               inquirer.prompt(ethStatsOptions).then(o => {
                 jsonObject.EthStats.Enabled = true
                 jsonObject.EthStats.Name = o.Name
+                // if(jsonObject.EthStats.Server === o.Server) {
+                //   return jsonObject.EthStats.Server
+                // } else {
+                //   jsonObject.EthStats.Server = o.Server
+                // }
                 jsonObject.EthStats.Secret = o.Secret
                 jsonObject.EthStats.Contact = o.Contact
                 fs.writeFileSync(`configs/${config}.cfg`, JSON.stringify(jsonObject, null, 4), "utf-8");
@@ -129,6 +133,8 @@ inquirer.prompt(mainOptions).then(o => {
               });
             }
           })
+        } else {
+          startProcess(applications.runner, ['--config', config]);
         }
       })
   });
