@@ -2,6 +2,8 @@ const inquirer = require('inquirer');
 const spawn = require('cross-spawn');
 const {platform} = require('os');
 const osType = platform();
+const fs = require('fs')
+
 
 const applications = {
   runner: 'Nethermind.Runner',
@@ -29,7 +31,7 @@ const mainOptions = [{
     type: 'list',
     name: 'mainConfig',
     message: 'Start Nethermind',
-    choices: ['Node', 'CLI'],
+    choices: ['Ethereum Node', 'CLI'],
     filter: function(value) {
       return value.toLowerCase();
     }
@@ -56,6 +58,47 @@ const options = [{
   }
 ];
 
+const ethStatsEnabled = [{
+    type: 'confirm',
+    name: 'Enabled',
+    message: 'Do you want to configure ethstats registration now?',
+    default: false
+  },
+]
+
+const ethStatsOptions = [
+  {
+    type: 'input',
+    name: 'Server',
+    message: 'What is the ethStats WebSocket address (this is a WebSocket address that you can obtain from Core Devs, depends on chain selected)?',
+    default: 'wss://ethstats.net/api'
+  },
+  {
+    type: 'input',
+    name: 'Name',
+    message: 'What should be the node name displyed on ethstats?',
+    default: 'Nethermind Node'
+  },
+  {
+    type: 'input',
+    name: 'Contact',
+    message: 'What should be the contact address for the node operator?',
+    default: 'dev@nethermind.io'
+  },
+  {
+    type: 'input',
+    name: 'Secret',
+    message: 'What is the ethstats password (this is a secret that you can obtain from Core Devs)?',
+    validate: function (input) {
+      if (input === '') {
+        console.log('Secret password needs to be provided.')
+      } else {
+        return true
+      }
+    }
+  },
+];
+
 inquirer.prompt(mainOptions).then(o => {
   if (o.mainConfig === 'cli') {
     startProcess(applications.cli, []);
@@ -63,7 +106,32 @@ inquirer.prompt(mainOptions).then(o => {
   }
   inquirer.prompt(options).then(o => {
       const config = `${o.config}${o.sync}`;
-      startProcess(applications.runner, ['--config', config]);
+      fs.readFile(`configs/${config}.cfg`, 'utf8', (err, jsonString) => {
+        if (err) {
+            console.log("Couldn't load config file:", err)
+            return
+        }
+        jsonObject = JSON.parse(jsonString)
+        console.log('EthStats:', jsonObject.EthStats)
+        if (jsonObject.EthStats.Enabled == false) {
+          inquirer.prompt(ethStatsEnabled).then(o => {
+            if (o.Enabled === false) {
+              console.log("EthStats configuration process will be skipped.");
+              startProcess(applications.runner, ['--config', config]);
+            } else {
+              inquirer.prompt(ethStatsOptions).then(o => {
+                jsonObject.EthStats.Enabled = true
+                jsonObject.EthStats.Server = o.Server
+                jsonObject.EthStats.Name = o.Name
+                jsonObject.EthStats.Secret = o.Secret
+                jsonObject.EthStats.Contact = o.Contact
+                fs.writeFileSync(`configs/${config}.cfg`, JSON.stringify(jsonObject, null, 4), "utf-8");
+                startProcess(applications.runner, ['--config', config]);
+              });
+            }
+          })
+        }
+      })
   });
 });
 
