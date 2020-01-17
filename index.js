@@ -132,7 +132,9 @@ inquirer.prompt(mainOptions).then(o => {
                     }
                   }
                 }).then(o => {
-                  jsonObject.EthStats.Server = o.Server
+                  if (jsonObject.EthStats.Server != o.Server && o.Server != "") {
+                    jsonObject.EthStats.Server = o.Server
+                  }
                   fs.writeFileSync(`configs/${config}.cfg`, JSON.stringify(jsonObject, null, 4), "utf-8")
                   startProcess(applications.runner, ['--config', config])})
               });
