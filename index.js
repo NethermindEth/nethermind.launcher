@@ -67,11 +67,6 @@ const ethStatsEnabled = [{
 ]
 
 const ethStatsOptions = [
-  // {
-  //  type: 'input',
-  //  name: 'Server',
-  //  message: 'What is the ethStats WebSocket address (this is a WebSocket address that you can obtain from Core Devs, depends on chain selected)?'
-  // },
   {
     type: 'input',
     name: 'Name',
@@ -90,7 +85,7 @@ const ethStatsOptions = [
     message: 'What is the ethstats password (this is a secret that you can obtain from Core Devs)?',
     validate: function (input) {
       if (input === '') {
-        console.log('Secret password needs to be provided.')
+        return 'Secret password needs to be provided.'
       } else {
         return true
       }
@@ -111,8 +106,8 @@ inquirer.prompt(mainOptions).then(o => {
             return
         }
         jsonObject = JSON.parse(jsonString)
-        console.log('EthStats:', jsonObject.EthStats)
         if (jsonObject.EthStats.Enabled == false) {
+          console.log('EthStats:', jsonObject.EthStats)
           inquirer.prompt(ethStatsEnabled).then(o => {
             if (o.Enabled === false) {
               console.log("EthStats configuration process will be skipped.");
@@ -121,15 +116,25 @@ inquirer.prompt(mainOptions).then(o => {
               inquirer.prompt(ethStatsOptions).then(o => {
                 jsonObject.EthStats.Enabled = true
                 jsonObject.EthStats.Name = o.Name
-                // if(jsonObject.EthStats.Server === o.Server) {
-                //   return jsonObject.EthStats.Server
-                // } else {
-                //   jsonObject.EthStats.Server = o.Server
-                // }
                 jsonObject.EthStats.Secret = o.Secret
                 jsonObject.EthStats.Contact = o.Contact
-                fs.writeFileSync(`configs/${config}.cfg`, JSON.stringify(jsonObject, null, 4), "utf-8");
-                startProcess(applications.runner, ['--config', config]);
+                inquirer.prompt({
+                  type: 'input',
+                  name: 'Server',
+                  message: 'What is the ethStats WebSocket address (this is a WebSocket address that you can obtain from Core Devs, depends on chain selected)?',
+                  default: function(value) {
+                    if (config == "goerli" || config == "goerli_archive") {
+                      return value = "wss://stats.goerli.net/api"
+                    } else if (config == "mainnet" || config == "mainnet_archive") {
+                      return value = "wss://ethstats.net/api"
+                    } else if (config == "ropsten" || config == "ropsten_archive") {
+                      return value = "ws://ropsten-stats.parity.io/api"
+                    }
+                  }
+                }).then(o => {
+                  jsonObject.EthStats.Server = o.Server
+                  fs.writeFileSync(`configs/${config}.cfg`, JSON.stringify(jsonObject, null, 4), "utf-8")
+                  startProcess(applications.runner, ['--config', config])})
               });
             }
           })
