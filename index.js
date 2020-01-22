@@ -110,7 +110,7 @@ const ethStatsOptions = [
   },
 ];
 
-const args = process.argv.slice(3)
+const args = process.argv.slice(2)
 
 inquirer.prompt(mainOptions).then(o => {
   if (o.mainConfig === 'cli') {
@@ -192,6 +192,7 @@ function startProcess(name, args) {
   const process = spawn(name, args, { stdio: 'inherit' });
   process.on('error', () => {
     console.error(`There was an error when starting ${name}`);
+    console.error("args: ", args)
   });
 }
 
