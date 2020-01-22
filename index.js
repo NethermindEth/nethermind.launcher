@@ -3,9 +3,6 @@ const spawn = require('cross-spawn');
 const { platform } = require('os');
 const osType = platform();
 const fs = require('fs');
-const program = require('commander');
-
-
 
 const applications = {
   runner: 'Nethermind.Runner',
@@ -113,16 +110,6 @@ const ethStatsOptions = [
   },
 ];
 
-function collect(value, previous) {
-  return previous.concat([value]);
-}
-
-program
- .description('Pass config parameters directly to the Nethermind Runner')
- .option('-a, --arguments <value>', 'collection of parameters which will be passed to Runner', collect, [])
-
-program.parse(process.argv);
-
 inquirer.prompt(mainOptions).then(o => {
   if (o.mainConfig === 'cli') {
     startProcess(applications.cli, []);
@@ -149,7 +136,7 @@ inquirer.prompt(mainOptions).then(o => {
           }
         });
       } else if (jsonObject.JsonRpc.Enabled == true && jsonObject.EthStats.Enabled == true) {
-        startProcess(applications.runner, ['--config', config, ...program.arguments]);
+        startProcess(applications.runner, ['--config', config, ...process.argv]);
       }
       else {
         ethStats(jsonObject, config)
@@ -164,8 +151,7 @@ function ethStats(jsonObject, config) {
     inquirer.prompt(ethStatsEnabled).then(o => {
       if (o.Enabled === false) {
         console.log("EthStats configuration process will be skipped.");
-        startProcess(applications.runner, ['--config', config, ...program.arguments
-      ]);
+        startProcess(applications.runner, ['--config', config, ...process.argv]);
       } else {
         inquirer.prompt(ethStatsOptions).then(o => {
           jsonObject.EthStats.Enabled = true
@@ -190,13 +176,13 @@ function ethStats(jsonObject, config) {
               jsonObject.EthStats.Server = o.Server
             }
             fs.writeFileSync(`configs/${config}.cfg`, JSON.stringify(jsonObject, null, 4), "utf-8")
-            startProcess(applications.runner, ['--config', config, ...program.arguments])
+            startProcess(applications.runner, ['--config', config, ...process.argv])
           })
         });
       }
     })
   } else {
-    startProcess(applications.runner, ['--config', config, ...program.arguments])
+    startProcess(applications.runner, ['--config', config, ...process.argv])
   }
 }
 
@@ -204,7 +190,6 @@ function startProcess(name, args) {
   const process = spawn(name, args, { stdio: 'inherit' });
   process.on('error', () => {
     console.error(`There was an error when starting ${name}`);
-    console.error(args)
   });
 }
 

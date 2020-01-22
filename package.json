@@ -10,7 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "chai": "^4.2.0",
-    "commander": "^4.1.0",
     "cross-spawn": "^6.0.5",
     "fs": "0.0.1-security",
     "inquirer": "^6.3.1",
