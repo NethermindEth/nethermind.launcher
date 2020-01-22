@@ -110,6 +110,8 @@ const ethStatsOptions = [
   },
 ];
 
+const args = process.argv.slice(3)
+
 inquirer.prompt(mainOptions).then(o => {
   if (o.mainConfig === 'cli') {
     startProcess(applications.cli, []);
@@ -136,7 +138,7 @@ inquirer.prompt(mainOptions).then(o => {
           }
         });
       } else if (jsonObject.JsonRpc.Enabled == true && jsonObject.EthStats.Enabled == true) {
-        startProcess(applications.runner, ['--config', config, ...process.argv]);
+        startProcess(applications.runner, ['--config', config, ...args]);
       }
       else {
         ethStats(jsonObject, config)
@@ -151,7 +153,7 @@ function ethStats(jsonObject, config) {
     inquirer.prompt(ethStatsEnabled).then(o => {
       if (o.Enabled === false) {
         console.log("EthStats configuration process will be skipped.");
-        startProcess(applications.runner, ['--config', config, ...process.argv]);
+        startProcess(applications.runner, ['--config', config,  ...args]);
       } else {
         inquirer.prompt(ethStatsOptions).then(o => {
           jsonObject.EthStats.Enabled = true
@@ -176,13 +178,13 @@ function ethStats(jsonObject, config) {
               jsonObject.EthStats.Server = o.Server
             }
             fs.writeFileSync(`configs/${config}.cfg`, JSON.stringify(jsonObject, null, 4), "utf-8")
-            startProcess(applications.runner, ['--config', config, ...process.argv])
+            startProcess(applications.runner, ['--config', config, ...args])
           })
         });
       }
     })
   } else {
-    startProcess(applications.runner, ['--config', config, ...process.argv])
+    startProcess(applications.runner, ['--config', config, ...args])
   }
 }
 
