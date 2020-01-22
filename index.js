@@ -2,7 +2,9 @@ const inquirer = require('inquirer');
 const spawn = require('cross-spawn');
 const { platform } = require('os');
 const osType = platform();
-const fs = require('fs')
+const fs = require('fs');
+const program = require('commander');
+
 
 
 const applications = {
@@ -111,6 +113,19 @@ const ethStatsOptions = [
   },
 ];
 
+function collect(value, previous) {
+  return previous.concat([value]);
+}
+
+program
+ .description('Pass config parameters directly to the Nethermind Runner')
+ .option('-c, --collect <value>', 'collection of parameters which will be passed to Runner', collect, [])
+
+program.parse(process.argv);
+
+// console.log(program);
+if (program.collect.length > 0) console.log(program.collect);
+
 inquirer.prompt(mainOptions).then(o => {
   if (o.mainConfig === 'cli') {
     startProcess(applications.cli, []);
@@ -137,7 +152,7 @@ inquirer.prompt(mainOptions).then(o => {
           }
         });
       } else if (jsonObject.JsonRpc.Enabled == true && jsonObject.EthStats.Enabled == true) {
-        startProcess(applications.runner, ['--config', config]);
+        startProcess(applications.runner, ['--config', config, ...program.collect]);
       }
       else {
         ethStats(jsonObject, config)
@@ -152,7 +167,7 @@ function ethStats(jsonObject, config) {
     inquirer.prompt(ethStatsEnabled).then(o => {
       if (o.Enabled === false) {
         console.log("EthStats configuration process will be skipped.");
-        startProcess(applications.runner, ['--config', config]);
+        startProcess(applications.runner, ['--config', config, ...program.collect]);
       } else {
         inquirer.prompt(ethStatsOptions).then(o => {
           jsonObject.EthStats.Enabled = true
@@ -177,13 +192,13 @@ function ethStats(jsonObject, config) {
               jsonObject.EthStats.Server = o.Server
             }
             fs.writeFileSync(`configs/${config}.cfg`, JSON.stringify(jsonObject, null, 4), "utf-8")
-            startProcess(applications.runner, ['--config', config])
+            startProcess(applications.runner, ['--config', config, ...program.collect])
           })
         });
       }
     })
   } else {
-    startProcess(applications.runner, ['--config', config])
+    startProcess(applications.runner, ['--config', config, ...program.collect])
   }
 }
 
