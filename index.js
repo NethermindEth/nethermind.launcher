@@ -119,12 +119,9 @@ function collect(value, previous) {
 
 program
  .description('Pass config parameters directly to the Nethermind Runner')
- .option('-c, --collect <value>', 'collection of parameters which will be passed to Runner', collect, [])
+ .option('-a, --arguments <value>', 'collection of parameters which will be passed to Runner', collect, [])
 
 program.parse(process.argv);
-
-// console.log(program);
-if (program.collect.length > 0) console.log(program.collect);
 
 inquirer.prompt(mainOptions).then(o => {
   if (o.mainConfig === 'cli') {
@@ -206,5 +203,11 @@ function startProcess(name, args) {
   const process = spawn(name, args, { stdio: 'inherit' });
   process.on('error', () => {
     console.error(`There was an error when starting ${name}`);
+    console.error(args)
   });
+}
+
+module.exports = {
+  applications,
+
 }
