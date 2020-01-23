@@ -3,6 +3,8 @@ const spawn = require('cross-spawn');
 const { platform } = require('os');
 const osType = platform();
 const fs = require('fs');
+const fetch = require("node-fetch");
+
 
 const applications = {
   runner: 'Nethermind.Runner',
@@ -35,22 +37,22 @@ const mainOptions = [{
 }
 ];
 
-const configs = fs.readdirSync('configs');
+//const configs = fs.readdirSync('configs');
 
-const networks = configs.filter((config) => {
-  return !config.includes('ndm') && !config.includes('archive') && !config.includes('test') && 
-    !config.includes('spaceneth') && !config.includes('hive') && !config.includes('Test')
-}).map((cfg) => {
-  c = cfg.replace('.cfg', '')
-  return c.charAt(0).toUpperCase() + c.slice(1)
-})
+// const networks = configs.filter((config) => {
+//   return !config.includes('ndm') && !config.includes('archive') && !config.includes('test') && 
+//     !config.includes('spaceneth') && !config.includes('hive') && !config.includes('Test')
+// }).map((cfg) => {
+//   c = cfg.replace('.cfg', '')
+//   return c.charAt(0).toUpperCase() + c.slice(1)
+// })
 
 const options = [{
   type: 'list',
   pageSize: 10,
   name: 'config',
   message: 'Select network',
-  choices: networks,
+  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoW testnet)', 'Rinkeby (heavy Clique testnet)', 'xDai', 'POA Core (POA mainnet)', 'Sokol (POA testnet)'],
   filter: function (value) {
     return value.toLowerCase();
   }
@@ -82,12 +84,28 @@ const jsonRpcEnabled = [{
 },
 ]
 
+// const clientIp = async () => {
+//   try {
+//       const response = await fetch('http://api.ipify.org/?format=json');
+//       const data = await response.json();
+//       return data.ip;
+//   } catch (err) {
+//     console.log(err)
+//   }
+// }
+
+const jsonRpcUrl = [{
+  type: 'input',
+  name: 'Host',
+  message: 'What should be the JSON RPC Host IP? (this should be the same as your host machine IP address)',
+  default: '127.0.0.1',
+}]
 
 const ethStatsOptions = [
   {
     type: 'input',
     name: 'Name',
-    message: 'What should be the node name displyed on ethstats?',
+    message: 'What should be the node name displayed on ethstats?',
     default: 'Nethermind Node'
   },
   {
@@ -118,7 +136,13 @@ inquirer.prompt(mainOptions).then(o => {
     return;
   }
   inquirer.prompt(options).then(o => {
-    const config = `${o.config}${o.sync}`;
+    if (o.config === 'ethereum (mainnet)') {
+      config = `mainnet${o.sync}`
+    } else if (o.config === 'poa core (poa mainnet)') {
+      config = `poacore${o.sync}`
+    } else {
+      config = `${o.config.split(" ")[0]}${o.sync}`
+    }
     fs.readFile(`configs/${config}.cfg`, 'utf8', (err, jsonString) => {
       if (err) {
         console.log("Couldn't load config file:", err)
@@ -130,8 +154,11 @@ inquirer.prompt(mainOptions).then(o => {
         inquirer.prompt(jsonRpcEnabled).then(j => {
           if (j.Enabled != false) {
             jsonObject.JsonRpc.Enabled = true
-            fs.writeFileSync(`configs/${config}.cfg`, JSON.stringify(jsonObject, null, 4), "utf-8");
-            ethStats(jsonObject, config);
+            inquirer.prompt(jsonRpcUrl).then(k => {
+              jsonObject.JsonRpc.Host = k.Host
+              ethStats(jsonObject, config);
+              fs.writeFileSync(`configs/${config}.cfg`, JSON.stringify(jsonObject, null, 4), "utf-8");
+            });
           } else {
             console.log("JsonRpc configuration will be skipped.");
             ethStats(jsonObject, config)
@@ -153,7 +180,7 @@ function ethStats(jsonObject, config) {
     inquirer.prompt(ethStatsEnabled).then(o => {
       if (o.Enabled === false) {
         console.log("EthStats configuration process will be skipped.");
-        startProcess(applications.runner, ['--config', config,  ...args]);
+        startProcess(applications.runner, ['--config', config, ...args]);
       } else {
         inquirer.prompt(ethStatsOptions).then(o => {
           jsonObject.EthStats.Enabled = true
@@ -198,5 +225,5 @@ function startProcess(name, args) {
 
 module.exports = {
   applications,
-
+  options,
 }
