@@ -34,8 +34,7 @@ const mainOptions = [{
   filter: function (value) {
     return value.toLowerCase();
   }
-}
-];
+}];
 
 //const configs = fs.readdirSync('configs');
 
@@ -219,11 +218,17 @@ function startProcess(name, args) {
   const process = spawn(name, args, { stdio: 'inherit' });
   process.on('error', () => {
     console.error(`There was an error when starting ${name}`);
-    console.error("args: ", args)
+    //console.error("args: ", args)
   });
 }
 
 module.exports = {
   applications,
   options,
+  jsonRpcEnabled,
+  jsonRpcUrl,
+  ethStatsEnabled,
+  ethStatsOptions,
+  mainOptions,
+  startProcess
 }

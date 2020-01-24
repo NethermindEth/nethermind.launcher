@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "nyc --reporter=text mocha"
   },
   "author": "",
   "license": "ISC",
@@ -17,7 +17,10 @@
     "jest": "^25.1.0",
     "lodash": "^4.17.15",
     "mocha": "^7.0.0",
+    "mock-fs": "^4.10.4",
     "node-fetch": "^2.6.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "nyc": "^15.0.0"
+  }
 }
