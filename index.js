@@ -103,18 +103,6 @@ const jsonRpcUrl = [{
 const ethStatsOptions = [
   {
     type: 'input',
-    name: 'Name',
-    message: 'What should be the node name displayed on ethstats?',
-    default: 'Nethermind Node'
-  },
-  {
-    type: 'input',
-    name: 'Contact',
-    message: 'What should be the contact address for the node operator?',
-    default: 'dev@nethermind.io'
-  },
-  {
-    type: 'input',
     name: 'Secret',
     message: 'What is the ethstats password (this is a secret that you can obtain from Core Devs)?',
     validate: function (input) {
@@ -125,6 +113,18 @@ const ethStatsOptions = [
       }
     }
   },
+  {
+    type: 'input',
+    name: 'Name',
+    message: 'What should be the node name displayed on ethstats?',
+    default: 'Nethermind Node'
+  },
+  {
+    type: 'input',
+    name: 'Contact',
+    message: 'What should be the contact address for the node operator?',
+    default: 'dev@nethermind.io'
+  }
 ];
 
 const args = process.argv.slice(2)
