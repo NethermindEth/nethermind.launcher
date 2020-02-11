@@ -159,8 +159,8 @@ describe('EthStats prompts', () => {
     })
   })
 
-  describe(`${index.ethStatsOptions[0].message}`, () => {
-    const options = index.ethStatsOptions[0]
+  describe(`${index.ethStatsOptions[1].message}`, () => {
+    const options = index.ethStatsOptions[1]
     let backup;
     before(() => {
       backup = inquirer.prompt;
@@ -176,8 +176,8 @@ describe('EthStats prompts', () => {
     })
   })
 
-  describe(`${index.ethStatsOptions[1].message}`, () => {
-    const options = index.ethStatsOptions[1]
+  describe(`${index.ethStatsOptions[2].message}`, () => {
+    const options = index.ethStatsOptions[2]
     let backup;
     before(() => {
       backup = inquirer.prompt;
@@ -193,8 +193,8 @@ describe('EthStats prompts', () => {
     })
   })
 
-  describe(`${index.ethStatsOptions[2].message}`, () => {
-    const options = index.ethStatsOptions[2]
+  describe(`${index.ethStatsOptions[0].message}`, () => {
+    const options = index.ethStatsOptions[0]
     let backup;
     before(() => {
       backup = inquirer.prompt;
