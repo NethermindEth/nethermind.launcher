@@ -147,7 +147,6 @@ inquirer.prompt(mainOptions).then(o => {
       } else {
         config = `${o.config.split(" ")[0]}${s.sync}`
       }
-      console.log(config)
       fs.readFile(`configs/${config}.cfg`, 'utf8', (err, jsonString) => {
         if (err) {
           console.log("Couldn't load config file:", err)
