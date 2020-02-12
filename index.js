@@ -51,21 +51,11 @@ const options = [{
   pageSize: 10,
   name: 'config',
   message: 'Select network',
-  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoW testnet)', 'Rinkeby (heavy Clique testnet)', 'xDai', 'POA Core (POA mainnet)', 'Sokol (POA testnet)'],
+  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Goerli Beam (Beam Sync)', 'Ropsten (PoW testnet)', 'Rinkeby (heavy Clique testnet)', 'xDai', 'POA Core (POA mainnet)', 'Sokol (POA testnet)'],
   filter: function (value) {
     return value.toLowerCase();
   }
-},
-{
-  type: 'list',
-  name: 'sync',
-  message: 'Select sync',
-  choices: ['Fast sync', 'Full archive'],
-  filter: function (value) {
-    return value === 'Fast sync' ? '' : '_archive';
-  }
-}
-];
+}];
 
 const ethStatsEnabled = [{
   type: 'confirm',
@@ -135,41 +125,58 @@ inquirer.prompt(mainOptions).then(o => {
     return;
   }
   inquirer.prompt(options).then(o => {
-    if (o.config === 'ethereum (mainnet)') {
-      config = `mainnet${o.sync}`
-    } else if (o.config === 'poa core (poa mainnet)') {
-      config = `poacore${o.sync}`
-    } else {
-      config = `${o.config.split(" ")[0]}${o.sync}`
-    }
-    fs.readFile(`configs/${config}.cfg`, 'utf8', (err, jsonString) => {
-      if (err) {
-        console.log("Couldn't load config file:", err)
-        return
+
+    choicesDefault = ['Fast sync', 'Full archive']
+    choicesBeamSync = ['Beam sync']
+
+    inquirer.prompt({
+      type: 'list',
+      name: 'sync',
+      message: 'Select sync',
+      choices: o.config === 'goerli beam (beam sync)' ? choicesBeamSync : choicesDefault,
+      filter: function (value) {
+        return value != 'Full archive' ? '' : '_archive';
       }
-      jsonObject = JSON.parse(jsonString)
-      if (jsonObject.JsonRpc.Enabled == false) {
-        console.log('JsonRpc:', jsonObject.JsonRpc)
-        inquirer.prompt(jsonRpcEnabled).then(j => {
-          if (j.Enabled != false) {
-            jsonObject.JsonRpc.Enabled = true
-            inquirer.prompt(jsonRpcUrl).then(k => {
-              jsonObject.JsonRpc.Host = k.Host
-              ethStats(jsonObject, config);
-              fs.writeFileSync(`configs/${config}.cfg`, JSON.stringify(jsonObject, null, 4), "utf-8");
-            });
-          } else {
-            console.log("JsonRpc configuration will be skipped.");
-            ethStats(jsonObject, config)
-          }
-        });
-      } else if (jsonObject.JsonRpc.Enabled == true && jsonObject.EthStats.Enabled == true) {
-        startProcess(applications.runner, ['--config', config, ...args]);
+    }).then(s => {
+      if (o.config === 'ethereum (mainnet)') {
+        config = `mainnet${s.sync}`
+      } else if (o.config === 'poa core (poa mainnet)') {
+        config = `poacore${s.sync}`
+      } else if (o.config === 'goerli beam (beam sync)') {
+        config = `goerli_beam`
+      } else {
+        config = `${o.config.split(" ")[0]}${s.sync}`
       }
-      else {
-        ethStats(jsonObject, config)
-      }
-    })
+      console.log(config)
+      fs.readFile(`configs/${config}.cfg`, 'utf8', (err, jsonString) => {
+        if (err) {
+          console.log("Couldn't load config file:", err)
+          return
+        }
+        jsonObject = JSON.parse(jsonString)
+        if (jsonObject.JsonRpc.Enabled == false) {
+          console.log('JsonRpc:', jsonObject.JsonRpc)
+          inquirer.prompt(jsonRpcEnabled).then(j => {
+            if (j.Enabled != false) {
+              jsonObject.JsonRpc.Enabled = true
+              inquirer.prompt(jsonRpcUrl).then(k => {
+                jsonObject.JsonRpc.Host = k.Host
+                ethStats(jsonObject, config);
+                fs.writeFileSync(`configs/${config}.cfg`, JSON.stringify(jsonObject, null, 4), "utf-8");
+              });
+            } else {
+              console.log("JsonRpc configuration will be skipped.");
+              ethStats(jsonObject, config)
+            }
+          });
+        } else if (jsonObject.JsonRpc.Enabled == true && jsonObject.EthStats.Enabled == true) {
+          startProcess(applications.runner, ['--config', config, ...args]);
+        }
+        else {
+          ethStats(jsonObject, config)
+        }
+      })
+    });
   });
 });
 
