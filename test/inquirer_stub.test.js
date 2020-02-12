@@ -87,8 +87,19 @@ describe('Selecting Ethereum network in fast sync mode', () => {
     })
   })
 
-  describe(`${index.options[1].message}`, () => {
-    const options = index.options[1]
+  describe(`Select sync`, () => {
+    choicesDefault = ['Fast sync', 'Full archive']
+    choicesBeamSync = ['Beam sync']
+    config = 'goerli beam (beam sync)'
+    const options = {
+      type: 'list',
+      name: 'sync',
+      message: 'Select sync',
+      choices: config === 'goerli beam (beam sync)' ? choicesBeamSync : choicesDefault,
+      filter: function (value) {
+        return value != 'Full archive' ? '' : '_archive';
+      }
+    }
     let backup;
     before(() => {
       backup = inquirer.prompt;
