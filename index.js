@@ -51,7 +51,7 @@ const options = [{
   pageSize: 10,
   name: 'config',
   message: 'Select network',
-  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Goerli Beam (Beam Sync)', 'Ropsten (PoW testnet)', 'Rinkeby (heavy Clique testnet)', 'xDai', 'POA Core (POA mainnet)', 'Sokol (POA testnet)'],
+  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoW testnet)', 'Rinkeby (heavy Clique testnet)', 'xDai', 'POA Core (POA mainnet)', 'Sokol (POA testnet)'],
   filter: function (value) {
     return value.toLowerCase();
   }
@@ -127,23 +127,27 @@ inquirer.prompt(mainOptions).then(o => {
   inquirer.prompt(options).then(o => {
 
     choicesDefault = ['Fast sync', 'Full archive']
-    choicesBeamSync = ['Beam sync']
+    choicesBeamSync = ['Fast sync', 'Full archive', 'Beam sync']
 
     inquirer.prompt({
       type: 'list',
       name: 'sync',
       message: 'Select sync',
-      choices: o.config === 'goerli beam (beam sync)' ? choicesBeamSync : choicesDefault,
+      choices: o.config === 'goerli (light clique testnet)' ? choicesBeamSync : choicesDefault,
       filter: function (value) {
-        return value != 'Full archive' ? '' : '_archive';
+        if (value === 'Fast sync') {
+          return ''
+        } else if ( value === 'Full archive') {
+          return '_archive'
+        } else {
+          return '_beam'
+        }
       }
     }).then(s => {
       if (o.config === 'ethereum (mainnet)') {
         config = `mainnet${s.sync}`
       } else if (o.config === 'poa core (poa mainnet)') {
         config = `poacore${s.sync}`
-      } else if (o.config === 'goerli beam (beam sync)') {
-        config = `goerli_beam`
       } else {
         config = `${o.config.split(" ")[0]}${s.sync}`
       }
