@@ -128,7 +128,6 @@ if(process.pkg){
     project_folder = __dirname
 }
 
-console.log(project_folder)
 inquirer.prompt(mainOptions).then(o => {
   if (o.mainConfig === 'cli') {
     startProcess(applications.cli, []);
