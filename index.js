@@ -136,7 +136,7 @@ inquirer.prompt(mainOptions).then(o => {
   inquirer.prompt(options).then(o => {
 
     choicesDefault = ['Fast sync', 'Full archive']
-    choicesBeamSync = ['Fast sync', 'Full archive', 'Beam sync']
+    choicesBeamSync = ['Fast sync', 'Full archive']
 
     inquirer.prompt({
       type: 'list',
