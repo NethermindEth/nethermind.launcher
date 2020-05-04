@@ -52,7 +52,7 @@ const options = [{
   pageSize: 10,
   name: 'config',
   message: 'Select network',
-  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoW testnet)', 'Rinkeby (heavy Clique testnet)', 'xDai', 'POA Core (POA mainnet)', 'Sokol (POA testnet)'],
+  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoW testnet)', 'Rinkeby (heavy Clique testnet)', 'xDai (POA stable chain)', 'POA Core (POA mainnet)', 'Sokol (POA testnet)'],
   filter: function (value) {
     return value.toLowerCase();
   }
@@ -135,18 +135,18 @@ inquirer.prompt(mainOptions).then(o => {
   }
   inquirer.prompt(options).then(o => {
 
-    choicesDefault = ['Fast sync', 'Full archive']
-    choicesBeamSync = ['Fast sync', 'Full archive']
+    choicesDefault = ['Fast sync', 'Archive']
+    choicesBeamSync = ['Fast sync', 'Archive', 'Fast Sync with Beam']
 
     inquirer.prompt({
       type: 'list',
       name: 'sync',
       message: 'Select sync',
-      choices: o.config === 'goerli (light clique testnet)' ? choicesBeamSync : choicesDefault,
+      choices: o.config === 'xdai (poa stable chain)' || o.config === 'sokol (poa testnet)' ? choicesDefault : choicesBeamSync,
       filter: function (value) {
         if (value === 'Fast sync') {
           return ''
-        } else if ( value === 'Full archive') {
+        } else if ( value === 'Archive') {
           return '_archive'
         } else {
           return '_beam'
