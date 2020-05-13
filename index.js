@@ -52,7 +52,7 @@ const options = [{
   pageSize: 10,
   name: 'config',
   message: 'Select network',
-  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoW testnet)', 'Rinkeby (heavy Clique testnet)', 'xDai (POA stable chain)', 'POA Core (POA mainnet)', 'Sokol (POA testnet)'],
+  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoW testnet)', 'Rinkeby (heavy Clique testnet)', 'xDai (POA stable chain)', 'POA Core (POA mainnet)', 'Sokol (POA testnet)', 'Spaceneth (local developer node)'],
   filter: function (value) {
     return value.toLowerCase();
   }
@@ -79,7 +79,7 @@ const jsonRpcEnabled = [{
 //       const response = await fetch('http://api.ipify.org/?format=json');
 //       const data = await response.json();
 //       return data.ip;
-//   } catch (err) {
+//   } catch (err) {syn
 //     console.log(err)
 //   }
 // }
@@ -137,17 +137,30 @@ inquirer.prompt(mainOptions).then(o => {
 
     choicesDefault = ['Fast sync', 'Archive']
     choicesBeamSync = ['Fast sync', 'Archive', 'Fast Sync with Beam']
+    choicesSpaceneth = ['in-memory (state is lost after restart)', 'persistent (state is stored in the DB)']
 
     inquirer.prompt({
       type: 'list',
       name: 'sync',
       message: 'Select sync',
-      choices: o.config === 'xdai (poa stable chain)' || o.config === 'sokol (poa testnet)' ? choicesDefault : choicesBeamSync,
+      choices: function () {
+        if (o.config === 'xdai (poa stable chain)' || o.config === 'sokol (poa testnet)') {
+          return choicesDefault
+        } else if (o.config === 'spaceneth (local developer node)') {
+          return choicesSpaceneth
+        } else {
+          return choicesBeamSync
+        }
+      },
       filter: function (value) {
         if (value === 'Fast sync') {
           return ''
         } else if ( value === 'Archive') {
           return '_archive'
+        } else if ( value === 'in-memory (state is lost after restart)') {
+          return ''
+        } else if ( value === 'persistent (state is stored in the DB)') {
+          return '_persistent'
         } else {
           return '_beam'
         }
