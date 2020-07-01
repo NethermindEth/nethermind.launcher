@@ -187,7 +187,7 @@ inquirer.prompt(mainOptions).then(o => {
               inquirer.prompt(jsonRpcUrl).then(k => {
                 jsonObject.JsonRpc.Host = k.Host
                 ethStats(jsonObject, config);
-                fs.writeFileSync(path.join(project_folder, `configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8");
+                fs.writeFile(path.join(project_folder, `configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8");
               });
             } else {
               console.log("JsonRpc configuration will be skipped.");
@@ -235,7 +235,7 @@ function ethStats(jsonObject, config) {
             if (jsonObject.EthStats.Server != o.Server && o.Server != "") {
               jsonObject.EthStats.Server = o.Server
             }
-            fs.writeFileSync(path.join(project_folder,`configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8")
+            fs.writeFile(path.join(project_folder,`configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8")
             startProcess(applications.runner, ['--config', config, ...args])
           })
         });
@@ -250,7 +250,13 @@ function startProcess(name, args) {
   const process = spawn(name, args, { stdio: 'inherit' });
   process.on('error', () => {
     console.error(`There was an error when starting ${name}`);
-    //console.error("args: ", args)
+  });
+  process.on('SIGINT', () => {
+    console.log('Received SIGINT');
+    let clds = process.children();
+    clds.forEach((pid) => {
+      process.kill(pid);
+    });
   });
 }
 
