@@ -7,7 +7,7 @@ const fetch = require("node-fetch");
 const path = require('path');
 const commander = require('commander');
 
-const program = new commander.Command();
+// const program = new commander.Command();
 
 const applications = {
   runner: 'Nethermind.Runner',
@@ -15,28 +15,28 @@ const applications = {
   wallet: 'Nethermind.BeamWallet'
 }
 
-program
-  .option('-i, --install', 'Install dependencies required by Nethermind client')
-  .option('-u, --update', 'Update Nethermind client to the latest release')
-  .description('Nethermind Launcher for Ethereum Client')
+// program
+//   .option('-i, --install', 'Install dependencies required by Nethermind client')
+//   .option('-u, --update', 'Update Nethermind client to the latest release')
+//   .description('Nethermind Launcher for Ethereum Client')
 
-program.parse(process.argv);
+// program.parse(process.argv);
 
 switch (osType) {
   case 'linux':
-    applications.runner = `./tools/${applications.runner}`;
-    applications.cli = `./tools/${applications.cli}`;
-    applications.wallet = `./tools/${applications.wallet}`;
+    applications.runner = `./${applications.runner}`;
+    applications.cli = `./${applications.cli}`;
+    applications.wallet = `./${applications.wallet}`;
     break;
   case 'darwin':
-    applications.runner = `./tools/${applications.runner}`;
-    applications.cli = `./tools/${applications.cli}`;
-    applications.wallet = `./tools/${applications.wallet}`;
+    applications.runner = `./${applications.runner}`;
+    applications.cli = `./${applications.cli}`;
+    applications.wallet = `./${applications.wallet}`;
     break;
   case 'win32':
-    applications.runner = `./tools/${applications.runner}.exe`;
-    applications.cli = `./tools/${applications.cli}.exe`;
-    applications.wallet = `./tools/${applications.wallet}`;
+    applications.runner = `./${applications.runner}.exe`;
+    applications.cli = `./${applications.cli}.exe`;
+    applications.wallet = `./${applications.wallet}`;
     break;
 }
 
@@ -142,13 +142,14 @@ if(process.pkg){
 }
 
 // Run dependencies installation script
-if (program.install) startProcess('./tools/install-dependencies.sh', [])
+// if (program.install) startProcess('./tools/install-dependencies.sh', [])
 
 // Run client update script
-if (program.update) startProcess('./tools/update-client.sh', [])
+// if (program.update) startProcess('./tools/update-client.sh', [])
 
 // Run Nethermind launcher app
-if (args.length == 0) inquirer.prompt(mainOptions).then(o => {
+// if (args.length == 0) 
+inquirer.prompt(mainOptions).then(o => {
   if (o.mainConfig === 'cli') {
     startProcess(applications.cli, []);
     return;
