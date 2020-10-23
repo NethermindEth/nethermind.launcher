@@ -6,8 +6,6 @@ const fs = require('fs');
 const fetch = require("node-fetch");
 const path = require('path');
 const commander = require('commander');
-const figlet = require('figlet');
-
 
 const program = new commander.Command();
 
