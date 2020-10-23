@@ -5,25 +5,38 @@ const osType = platform();
 const fs = require('fs');
 const fetch = require("node-fetch");
 const path = require('path');
+const commander = require('commander');
 
+const program = new commander.Command();
 
 const applications = {
   runner: 'Nethermind.Runner',
   cli: 'Nethermind.Cli',
+  wallet: 'Nethermind.BeamWallet'
 }
+
+program
+  .option('-i, --install', 'Install dependencies required by Nethermind client')
+  .option('-u, --update', 'Update Nethermind client to the latest release')
+  .description('Nethermind Launcher for Ethereum Client')
+
+program.parse(process.argv);
 
 switch (osType) {
   case 'linux':
-    applications.runner = `./${applications.runner}`;
-    applications.cli = `./${applications.cli}`;
+    applications.runner = `./tools/${applications.runner}`;
+    applications.cli = `./tools/${applications.cli}`;
+    applications.wallet = `./tools/${applications.wallet}`;
     break;
   case 'darwin':
-    applications.runner = `./${applications.runner}`;
-    applications.cli = `./${applications.cli}`;
+    applications.runner = `./tools/${applications.runner}`;
+    applications.cli = `./tools/${applications.cli}`;
+    applications.wallet = `./tools/${applications.wallet}`;
     break;
   case 'win32':
-    applications.runner = `${applications.runner}.exe`;
-    applications.cli = `./${applications.cli}.exe`;
+    applications.runner = `./tools/${applications.runner}.exe`;
+    applications.cli = `./tools/${applications.cli}.exe`;
+    applications.wallet = `./tools/${applications.wallet}`;
     break;
 }
 
@@ -31,7 +44,7 @@ const mainOptions = [{
   type: 'list',
   name: 'mainConfig',
   message: 'Start Nethermind',
-  choices: ['Ethereum Node', 'CLI'],
+  choices: ['Ethereum Node', 'CLI', 'Beam Wallet'],
   filter: function (value) {
     return value.toLowerCase();
   }
@@ -128,9 +141,19 @@ if(process.pkg){
     project_folder = __dirname
 }
 
-inquirer.prompt(mainOptions).then(o => {
+// Run dependencies installation script
+if (program.install) startProcess('./tools/install-dependencies.sh', [])
+
+// Run client update script
+if (program.update) startProcess('./tools/update-client.sh', [])
+
+// Run Nethermind launcher app
+if (args.length == 0) inquirer.prompt(mainOptions).then(o => {
   if (o.mainConfig === 'cli') {
     startProcess(applications.cli, []);
+    return;
+  } else if (o.mainConfig === 'beam wallet') {
+    startProcess(applications.wallet, []);
     return;
   }
   inquirer.prompt(options).then(o => {
@@ -187,7 +210,7 @@ inquirer.prompt(mainOptions).then(o => {
               inquirer.prompt(jsonRpcUrl).then(k => {
                 jsonObject.JsonRpc.Host = k.Host
                 ethStats(jsonObject, config);
-                fs.writeFileSync(path.join(project_folder, `configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8");
+                fs.writeFile(path.join(project_folder, `configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8");
               });
             } else {
               console.log("JsonRpc configuration will be skipped.");
@@ -235,7 +258,7 @@ function ethStats(jsonObject, config) {
             if (jsonObject.EthStats.Server != o.Server && o.Server != "") {
               jsonObject.EthStats.Server = o.Server
             }
-            fs.writeFileSync(path.join(project_folder,`configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8")
+            fs.writeFile(path.join(project_folder,`configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8")
             startProcess(applications.runner, ['--config', config, ...args])
           })
         });
@@ -248,9 +271,15 @@ function ethStats(jsonObject, config) {
 
 function startProcess(name, args) {
   const process = spawn(name, args, { stdio: 'inherit' });
-  process.on('error', () => {
-    console.error(`There was an error when starting ${name}`);
-    //console.error("args: ", args)
+  process.on('error', (err) => {
+    console.error(`There was an error when starting ${name}` + err);
+  });
+  process.on('SIGINT', () => {
+    console.log('Received SIGINT');
+    let clds = process.children();
+    clds.forEach((pid) => {
+      process.kill(pid);
+    });
   });
 }
 
