@@ -199,7 +199,7 @@ inquirer.prompt(mainOptions).then(o => {
       }
       fs.readFile(path.join(project_folder, `configs/${config}.cfg`), 'utf8', (err, jsonString) => {
         if (err) {
-          console.log("Couldn't load config file:", err)
+          console.log(`Couldn't load config ${config} file: `, err)
           return
         }
         jsonObject = JSON.parse(jsonString)
@@ -211,7 +211,12 @@ inquirer.prompt(mainOptions).then(o => {
               inquirer.prompt(jsonRpcUrl).then(k => {
                 jsonObject.JsonRpc.Host = k.Host
                 ethStats(jsonObject, config);
-                fs.writeFile(path.join(project_folder, `configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8");
+                fs.writeFile(path.join(project_folder, `configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8", (err) => {
+                  if (err) {
+                    console.log(`Couldn't write the config ${config} file: `, err)
+                    return
+                  }
+                });
               });
             } else {
               console.log("JsonRpc configuration will be skipped.");
@@ -259,8 +264,9 @@ function ethStats(jsonObject, config) {
             if (jsonObject.EthStats.Server != o.Server && o.Server != "") {
               jsonObject.EthStats.Server = o.Server
             }
-            fs.writeFile(path.join(project_folder,`configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8")
-            startProcess(applications.runner, ['--config', config, ...args])
+            fs.writeFile(path.join(project_folder,`configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8", () =>
+              startProcess(applications.runner, ['--config', config, ...args])
+            )  
           })
         });
       }
