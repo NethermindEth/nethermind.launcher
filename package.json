@@ -15,7 +15,7 @@
     "commander": "^6.1.0",
     "cross-spawn": "^6.0.5",
     "fs": "0.0.1-security",
-    "inquirer": "^6.3.1",
+    "inquirer": "^6.5.2",
     "jest": "^25.1.0",
     "lodash": "^4.17.19",
     "mocha": "^7.0.0",
