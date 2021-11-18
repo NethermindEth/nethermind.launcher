@@ -11,8 +11,7 @@ const commander = require('commander');
 
 const applications = {
   runner: 'Nethermind.Runner',
-  cli: 'Nethermind.Cli',
-  wallet: 'Nethermind.BeamWallet'
+  cli: 'Nethermind.Cli'
 }
 
 // program
@@ -26,17 +25,14 @@ switch (osType) {
   case 'linux':
     applications.runner = `./${applications.runner}`;
     applications.cli = `./${applications.cli}`;
-    applications.wallet = `./${applications.wallet}`;
     break;
   case 'darwin':
     applications.runner = `./${applications.runner}`;
     applications.cli = `./${applications.cli}`;
-    applications.wallet = `./${applications.wallet}`;
     break;
   case 'win32':
     applications.runner = `./${applications.runner}.exe`;
     applications.cli = `./${applications.cli}.exe`;
-    applications.wallet = `./${applications.wallet}`;
     break;
 }
 
@@ -44,21 +40,11 @@ const mainOptions = [{
   type: 'list',
   name: 'mainConfig',
   message: 'Start Nethermind',
-  choices: ['Ethereum Node', 'CLI', 'Beam Wallet'],
+  choices: ['Ethereum Node', 'CLI'],
   filter: function (value) {
     return value.toLowerCase();
   }
 }];
-
-//const configs = fs.readdirSync('configs');
-
-// const networks = configs.filter((config) => {
-//   return !config.includes('ndm') && !config.includes('archive') && !config.includes('test') && 
-//     !config.includes('spaceneth') && !config.includes('hive') && !config.includes('Test')
-// }).map((cfg) => {
-//   c = cfg.replace('.cfg', '')
-//   return c.charAt(0).toUpperCase() + c.slice(1)
-// })
 
 const options = [{
   type: 'list',
@@ -86,16 +72,6 @@ const jsonRpcEnabled = [{
   default: false
 },
 ]
-
-// const clientIp = async () => {
-//   try {
-//       const response = await fetch('http://api.ipify.org/?format=json');
-//       const data = await response.json();
-//       return data.ip;
-//   } catch (err) {syn
-//     console.log(err)
-//   }
-// }
 
 const jsonRpcUrl = [{
   type: 'input',
@@ -141,26 +117,14 @@ if(process.pkg){
     project_folder = __dirname
 }
 
-// Run dependencies installation script
-// if (program.install) startProcess('./tools/install-dependencies.sh', [])
-
-// Run client update script
-// if (program.update) startProcess('./tools/update-client.sh', [])
-
-// Run Nethermind launcher app
-// if (args.length == 0) 
 inquirer.prompt(mainOptions).then(o => {
   if (o.mainConfig === 'cli') {
     startProcess(applications.cli, []);
-    return;
-  } else if (o.mainConfig === 'beam wallet') {
-    startProcess(applications.wallet, []);
     return;
   }
   inquirer.prompt(options).then(o => {
 
     choicesDefault = ['Fast sync', 'Archive']
-    choicesBeamSync = ['Fast sync', 'Archive', 'Fast Sync with Beam']
     choicesSpaceneth = ['in-memory (state is lost after restart)', 'persistent (state is stored in the DB)']
 
     inquirer.prompt({
@@ -168,12 +132,10 @@ inquirer.prompt(mainOptions).then(o => {
       name: 'sync',
       message: 'Select sync',
       choices: function () {
-        if (o.config === 'xdai (poa stable chain)' || o.config === 'sokol (poa testnet)') {
-          return choicesDefault
-        } else if (o.config === 'spaceneth (local developer node)') {
+        if (o.config === 'spaceneth (local developer node)') {
           return choicesSpaceneth
         } else {
-          return choicesBeamSync
+          return choicesDefault
         }
       },
       filter: function (value) {
@@ -185,8 +147,6 @@ inquirer.prompt(mainOptions).then(o => {
           return ''
         } else if ( value === 'persistent (state is stored in the DB)') {
           return '_persistent'
-        } else {
-          return '_beam'
         }
       }
     }).then(s => {
