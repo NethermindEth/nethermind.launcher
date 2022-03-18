@@ -22,7 +22,7 @@
     "mock-fs": "^4.10.4",
     "node-fetch": "^2.6.1",
     "path": "^0.12.7",
-    "pkg": "^4.4.4",
+    "pkg": "^5.5.2",
     "tree-kill": "^1.2.2"
   },
   "devDependencies": {

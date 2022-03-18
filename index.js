@@ -163,7 +163,7 @@ inquirer.prompt(mainOptions).then(o => {
           return
         }
         jsonObject = JSON.parse(jsonString)
-        if (jsonObject.JsonRpc.Enabled == false) {
+        if (jsonObject.JsonRpc in jsonObject && jsonObject.JsonRpc.Enabled === false) {
           console.log('JsonRpc:', jsonObject.JsonRpc)
           inquirer.prompt(jsonRpcEnabled).then(j => {
             if (j.Enabled != false) {
@@ -183,7 +183,7 @@ inquirer.prompt(mainOptions).then(o => {
               ethStats(jsonObject, config)
             }
           });
-        } else if (jsonObject.JsonRpc.Enabled == true && jsonObject.EthStats.Enabled == true) {
+        } else if (jsonObject.JsonRpc in jsonObject && jsonObject.JsonRpc.Enabled == true && jsonObject.EthStats in jsonObject && jsonObject.EthStats.Enabled == true) {
           startProcess(applications.runner, ['--config', config, ...args]);
         }
         else {
