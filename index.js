@@ -51,7 +51,7 @@ const options = [{
   pageSize: 10,
   name: 'config',
   message: 'Select network',
-  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoW testnet)', 'Rinkeby (heavy Clique testnet)', 'xDai (POA stable chain)', 'POA Core (POA mainnet)', 'Sokol (POA testnet)', 'Spaceneth (local developer node)'],
+  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoS testnet)', 'Sepolia (PoW testnet)', 'Rinkeby (heavy Clique testnet)', 'Gnosis (formerly xDai chain)', 'POA Core (POA mainnet)', 'Spaceneth (local developer node)'],
   filter: function (value) {
     return value.toLowerCase();
   }
@@ -154,6 +154,8 @@ inquirer.prompt(mainOptions).then(o => {
         config = `mainnet${s.sync}`
       } else if (o.config === 'poa core (poa mainnet)') {
         config = `poacore${s.sync}`
+      } else if (o.config === 'gnosis (formerly xdai chain)') {
+        config = `xdai{s.sync}`
       } else {
         config = `${o.config.split(" ")[0]}${s.sync}`
       }
