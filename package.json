@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=text mocha"
+    "test": "nyc --reporter=text mocha",
+    "start": "node index.js",
+    "build:macos": "pkg index.js -t latest-macos-x64 -o Nethermind.Launcher",
+    "build:linux": "pkg index.js -t latest-linux-x64 -o Nethermind.Launcher",
+    "build:windows": "pkg index.js -t latest-win-x64 -o Nethermind.Launcher"
   },
   "author": "",
   "license": "ISC",

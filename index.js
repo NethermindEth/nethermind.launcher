@@ -163,7 +163,7 @@ inquirer.prompt(mainOptions).then(o => {
           return
         }
         jsonObject = JSON.parse(jsonString)
-        if (jsonObject.JsonRpc in jsonObject && jsonObject.JsonRpc.Enabled === false) {
+        if (jsonObject?.JsonRpc?.Enabled === false) {
           console.log('JsonRpc:', jsonObject.JsonRpc)
           inquirer.prompt(jsonRpcEnabled).then(j => {
             if (j.Enabled != false) {
