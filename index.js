@@ -167,7 +167,7 @@ inquirer.prompt(mainOptions).then(o => {
           console.log('JsonRpc:', jsonObject.JsonRpc)
           inquirer.prompt(jsonRpcEnabled).then(j => {
             if (j.Enabled != false) {
-              jsonObject.JsonRpc.Enabled = true
+              jsonObject?.JsonRpc?.Enabled = true
               inquirer.prompt(jsonRpcUrl).then(k => {
                 jsonObject.JsonRpc.Host = k.Host
                 ethStats(jsonObject, config);
@@ -195,7 +195,7 @@ inquirer.prompt(mainOptions).then(o => {
 });
 
 function ethStats(jsonObject, config) {
-  if (jsonObject.EthStats.Enabled == false) {
+  if (jsonObject?.EthStats?.Enabled == false) {
     console.log('EthStats:', jsonObject.EthStats)
     inquirer.prompt(ethStatsEnabled).then(o => {
       if (o.Enabled === false) {
@@ -203,10 +203,10 @@ function ethStats(jsonObject, config) {
         startProcess(applications.runner, ['--config', config, ...args]);
       } else {
         inquirer.prompt(ethStatsOptions).then(o => {
-          jsonObject.EthStats.Enabled = true
-          jsonObject.EthStats.Name = o.Name
-          jsonObject.EthStats.Secret = o.Secret
-          jsonObject.EthStats.Contact = o.Contact
+          jsonObject?.EthStats?.Enabled = true
+          jsonObject?.EthStats?.Name = o.Name
+          jsonObject?.EthStats?.Secret = o.Secret
+          jsonObject?.EthStats?.Contact = o.Contact
           inquirer.prompt({
             type: 'input',
             name: 'Server',
@@ -221,8 +221,8 @@ function ethStats(jsonObject, config) {
               }
             }
           }).then(o => {
-            if (jsonObject.EthStats.Server != o.Server && o.Server != "") {
-              jsonObject.EthStats.Server = o.Server
+            if (jsonObject?.EthStats?.Server != o.Server && o.Server != "") {
+              jsonObject?.EthStats?.Server = o.Server
             }
             fs.writeFile(path.join(project_folder,`configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8", () =>
               startProcess(applications.runner, ['--config', config, ...args])
