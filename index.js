@@ -155,7 +155,7 @@ inquirer.prompt(mainOptions).then(o => {
       } else if (o.config === 'poa core (poa mainnet)') {
         config = `poacore${s.sync}`
       } else if (o.config === 'gnosis (formerly xdai chain)') {
-        config = `xdai{s.sync}`
+        config = `xdai${s.sync}`
       } else {
         config = `${o.config.split(" ")[0]}${s.sync}`
       }
