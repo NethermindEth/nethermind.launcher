@@ -51,7 +51,7 @@ const options = [{
   pageSize: 10,
   name: 'config',
   message: 'Select network',
-  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoS testnet)', 'Sepolia (PoW testnet)', 'Rinkeby (heavy Clique testnet)', 'Gnosis (formerly xDai chain)', 'POA Core (POA mainnet)', 'Spaceneth (local developer node)'],
+  choices: ['Ethereum (PoW mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoS testnet)', 'Sepolia (PoS testnet)', 'Kiln (Temperary PoS Testnet)', 'Rinkeby (heavy Clique testnet)', 'Gnosis (formerly xDai chain)', 'POA Core (POA mainnet)', 'Spaceneth (local developer node)'],
   filter: function (value) {
     return value.toLowerCase();
   }
@@ -123,8 +123,18 @@ inquirer.prompt(mainOptions).then(o => {
     return;
   }
   inquirer.prompt(options).then(o => {
+// 'Rinkeby (heavy Clique testnet)', 'Gnosis (formerly xDai chain)', 'POA Core (POA mainnet)'
+    defaultSnap = ['Snap sync', 'Archive/Full sync', 'MEV']
+    defaultFast = ['Fast sync', 'Archive/Full sync']
 
-    choicesDefault = ['Fast sync', 'Archive']
+    choicesMainnet = defaultSnap
+    choicesRopsten = defaultSnap.slice(0,2)
+    choicesKiln = defaultFast
+    choicesGoerli = defaultSnap
+    choicesSepolia = defaultFast
+    choicesRinkeby = defaultFast
+    choicesGnosis =  defaultFast.push('MEV', 'The Merge', 'Validator')
+    choicesPOAcore = defaultFast.push('Validator')
     choicesSpaceneth = ['in-memory (state is lost after restart)', 'persistent (state is stored in the DB)']
 
     inquirer.prompt({
