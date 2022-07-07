@@ -51,7 +51,7 @@ const options = [{
   pageSize: 10,
   name: 'config',
   message: 'Select network',
-  choices: ['Ethereum (PoW mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoS testnet)', 'Sepolia (PoS testnet)', 'Kiln (Temperary PoS Testnet)', 'Rinkeby (heavy Clique testnet)', 'Gnosis (formerly xDai chain)', 'POA Core (POA mainnet)', 'Spaceneth (local developer node)'],
+  choices: ['Ethereum (PoW mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoS testnet)', 'Sepolia (PoS testnet)', 'Kiln (PoS testnet)', 'Rinkeby (heavy Clique testnet)', 'Gnosis (formerly xDai chain)', 'POA Core (POA mainnet)', 'Spaceneth (local developer node)'],
   filter: function (value) {
     return value.toLowerCase();
   }
@@ -123,18 +123,8 @@ inquirer.prompt(mainOptions).then(o => {
     return;
   }
   inquirer.prompt(options).then(o => {
-// 'Rinkeby (heavy Clique testnet)', 'Gnosis (formerly xDai chain)', 'POA Core (POA mainnet)'
-    defaultSnap = ['Snap sync', 'Archive/Full sync', 'MEV']
-    defaultFast = ['Fast sync', 'Archive/Full sync']
-
-    choicesMainnet = defaultSnap
-    choicesRopsten = defaultSnap.slice(0,2)
-    choicesKiln = defaultFast
-    choicesGoerli = defaultSnap
-    choicesSepolia = defaultFast
-    choicesRinkeby = defaultFast
-    choicesGnosis =  defaultFast.push('MEV', 'The Merge', 'Validator')
-    choicesPOAcore = defaultFast.push('Validator')
+    choicesSnap = ['Snap sync', 'Archive/Full sync', 'MEV']
+    choicesFast = ['Fast sync', 'Archive/Full sync']
     choicesSpaceneth = ['in-memory (state is lost after restart)', 'persistent (state is stored in the DB)']
 
     inquirer.prompt({
@@ -144,15 +134,31 @@ inquirer.prompt(mainOptions).then(o => {
       choices: function () {
         if (o.config === 'spaceneth (local developer node)') {
           return choicesSpaceneth
-        } else {
-          return choicesDefault
+        } else if(o.config === 'ethereum (pow mainnet)' || o.config === 'goerli (light clique testnet)') {
+          return choicesSnap
+        } else if(o.config === 'ropsten (pos testnet)') {
+          return choicesSnap.slice(0,2)
+        } else if(o.config === 'sepolia (pos testnet)' || o.config === 'kiln (pos testnet)' || o.config === 'rinkeby (heavy clique testnet)') {
+          return choicesFast
+        } else if(o.config === 'gnosis (formerly xdai chain)') {
+          choicesFast.push('MEV', 'The Merge', 'Validator')
+          return choicesFast
+        } else if(o.config === 'poa core (poa mainnet)') {
+          choicesFast.push('Validator')
+          return choicesFast
         }
       },
       filter: function (value) {
-        if (value === 'Fast sync') {
+        if (value === 'Fast sync' || value === 'Snap sync') {
           return ''
-        } else if ( value === 'Archive') {
+        } else if ( value === 'Archive/Full sync') {
           return '_archive'
+        } else if ( value === 'MEV') {
+          return '_mev'
+        } else if ( value === 'The Merge') {
+          return '_themerge'
+        } else if ( value === 'Validator') {
+          return '_validator'
         } else if ( value === 'in-memory (state is lost after restart)') {
           return ''
         } else if ( value === 'persistent (state is stored in the DB)') {
