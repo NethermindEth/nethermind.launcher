@@ -166,7 +166,7 @@ inquirer.prompt(mainOptions).then(o => {
         }
       }
     }).then(s => {
-      if (o.config === 'ethereum (mainnet)') {
+      if (o.config === 'ethereum (pow mainnet)') {
         config = `mainnet${s.sync}`
       } else if (o.config === 'poa core (poa mainnet)') {
         config = `poacore${s.sync}`
