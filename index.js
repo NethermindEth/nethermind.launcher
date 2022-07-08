@@ -141,7 +141,7 @@ inquirer.prompt(mainOptions).then(o => {
         } else if(o.config === 'sepolia (pos testnet)' || o.config === 'kiln (pos testnet)' || o.config === 'rinkeby (heavy clique testnet)') {
           return choicesFast
         } else if(o.config === 'gnosis (formerly xdai chain)') {
-          choicesFast.push('MEV', 'The Merge', 'Validator')
+          choicesFast.push('MEV', 'Validator')
           return choicesFast
         } else if(o.config === 'poa core (poa mainnet)') {
           choicesFast.push('Validator')
