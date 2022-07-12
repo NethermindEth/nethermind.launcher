@@ -51,7 +51,7 @@ const options = [{
   pageSize: 10,
   name: 'config',
   message: 'Select network',
-  choices: ['Ethereum (PoW mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoS testnet)', 'Sepolia (PoS testnet)', 'Kiln (PoS testnet)', 'Rinkeby (heavy Clique testnet)', 'Gnosis (formerly xDai chain)', 'POA Core (POA mainnet)', 'Spaceneth (local developer node)'],
+  choices: ['Ethereum (mainnet)', 'Goerli (light Clique testnet)', 'Ropsten (PoS testnet)', 'Sepolia (PoS testnet)', 'Kiln (PoS testnet)', 'Rinkeby (heavy Clique testnet)', 'Gnosis (formerly xDai chain)', 'POA Core (POA mainnet)', 'Spaceneth (local developer node)'],
   filter: function (value) {
     return value.toLowerCase();
   }
@@ -134,7 +134,7 @@ inquirer.prompt(mainOptions).then(o => {
       choices: function () {
         if (o.config === 'spaceneth (local developer node)') {
           return choicesSpaceneth
-        } else if(o.config === 'ethereum (pow mainnet)' || o.config === 'goerli (light clique testnet)') {
+        } else if(o.config === 'ethereum (mainnet)' || o.config === 'goerli (light clique testnet)') {
           return choicesSnap
         } else if(o.config === 'ropsten (pos testnet)') {
           return choicesSnap.slice(0,2)
@@ -166,7 +166,7 @@ inquirer.prompt(mainOptions).then(o => {
         }
       }
     }).then(s => {
-      if (o.config === 'ethereum (pow mainnet)') {
+      if (o.config === 'ethereum (mainnet)') {
         config = `mainnet${s.sync}`
       } else if (o.config === 'poa core (poa mainnet)') {
         config = `poacore${s.sync}`
