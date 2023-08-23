@@ -10,8 +10,8 @@ const commander = require('commander');
 // const program = new commander.Command();
 
 const applications = {
-  runner: 'Nethermind.Runner',
-  cli: 'Nethermind.Cli'
+  runner: 'nethermind',
+  cli: 'nethermind-cli'
 }
 
 // program
