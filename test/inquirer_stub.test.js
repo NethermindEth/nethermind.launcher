@@ -24,7 +24,7 @@ describe('Applications', function() {
   });
 
   it('applications should include Runner and Cli', function() {
-      expect(index.applications).to.include({ runner: './Nethermind.Runner', cli: './Nethermind.Cli' });
+      expect(index.applications).to.include({ runner: './nethermind', cli: './nethermind-cli' });
   });
 });
 
