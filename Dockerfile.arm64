@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2022 Demerzel Solutions Limited
+# SPDX-License-Identifier: LGPL-3.0-only
+
+FROM arm64v8/node AS build
+
+ARG APP_NAME
+
+WORKDIR /source
+
+COPY . .
+
+RUN npm i pkg @vercel/ncc -g && \
+    npm i && \
+    pkg index.js -t latest-linux-arm64 -o $APP_NAME
+
+FROM arm64v8/node AS launcher
+
+ARG APP_NAME
+
+WORKDIR /nethermind
+
+COPY --from=build /source/$APP_NAME .
