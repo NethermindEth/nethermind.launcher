@@ -15,7 +15,16 @@ jobs:
       APP_NAME: nethermind-launcher
       PUB_DIR: artifacts
     steps:
+      - name: Create GitHub app token
+        id: gh-app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          repositories: ${{ github.repository }}
       - name: Check out repository
+        with:
+          token: ${{ steps.gh-app.outputs.token }}
         uses: actions/checkout@v4
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -44,7 +53,7 @@ jobs:
           mv $APP_NAME-linux-arm64 $PUB_DIR/
       - name: Publish to GitHub Releases
         env:
-          GH_TOKEN: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
+          GH_TOKEN: ${{ steps.gh-app.outputs.token }}
         run: |
           gh release create ${{ github.event.inputs.tag }} -d --generate-notes --latest -t "${{ github.event.inputs.tag }}"
           gh release upload ${{ github.event.inputs.tag }} \
