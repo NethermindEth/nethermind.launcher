@@ -112,7 +112,7 @@ const args = process.argv.slice(2)
 let project_folder;
 if(process.pkg){
     project_folder = path.dirname(process.execPath)
-    
+
 } else{
     project_folder = __dirname
 }
@@ -159,7 +159,7 @@ inquirer.prompt(mainOptions).then(o => {
       } else {
         config = `${o.config.split(" ")[0]}${s.sync}`
       }
-      fs.readFile(path.join(project_folder, `configs/${config}.cfg`), 'utf8', (err, jsonString) => {
+      fs.readFile(path.join(project_folder, `configs/${config}.json`), 'utf8', (err, jsonString) => {
         if (err) {
           console.log(`Couldn't load config ${config} file: `, err)
           return
@@ -173,7 +173,7 @@ inquirer.prompt(mainOptions).then(o => {
               inquirer.prompt(jsonRpcUrl).then(k => {
                 jsonObject.JsonRpc.Host = k.Host
                 ethStats(jsonObject, config);
-                fs.writeFile(path.join(project_folder, `configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8", (err) => {
+                fs.writeFile(path.join(project_folder, `configs/${config}.json`), JSON.stringify(jsonObject, null, 4), "utf-8", (err) => {
                   if (err) {
                     console.log(`Couldn't write the config ${config} file: `, err)
                     return
@@ -226,9 +226,9 @@ function ethStats(jsonObject, config) {
             if (jsonObject?.EthStats?.Server != o.Server && o.Server != "") {
               jsonObject.EthStats.Server = o.Server
             }
-            fs.writeFile(path.join(project_folder,`configs/${config}.cfg`), JSON.stringify(jsonObject, null, 4), "utf-8", () =>
+            fs.writeFile(path.join(project_folder,`configs/${config}.json`), JSON.stringify(jsonObject, null, 4), "utf-8", () =>
               startProcess(applications.runner, ['--config', config, ...args])
-            )  
+            )
           })
         });
       }
