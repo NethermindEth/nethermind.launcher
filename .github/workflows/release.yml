@@ -15,16 +15,7 @@ jobs:
       APP_NAME: nethermind-launcher
       PUB_DIR: artifacts
     steps:
-      - name: Create GitHub app token
-        id: gh-app
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          repositories: ${{ github.repository }}
       - name: Check out repository
-        with:
-          token: ${{ steps.gh-app.outputs.token }}
         uses: actions/checkout@v4
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -51,14 +42,9 @@ jobs:
           docker buildx build --platform=linux/arm64 -t tmp-launcher --build-arg APP_NAME=$APP_NAME-linux-arm64 -f Dockerfile.arm64 . --load
           docker run --platform=linux/arm64 -v $PWD:/opt/mount --rm tmp-launcher bash -c "cp /nethermind/$APP_NAME-linux-arm64 /opt/mount/"
           mv $APP_NAME-linux-arm64 $PUB_DIR/
-      - name: Publish to GitHub Releases
-        env:
-          GH_TOKEN: ${{ steps.gh-app.outputs.token }}
-        run: |
-          gh release create ${{ github.event.inputs.tag }} -d --generate-notes --latest -t "${{ github.event.inputs.tag }}"
-          gh release upload ${{ github.event.inputs.tag }} \
-            $PUB_DIR/$APP_NAME-linux-x64 \
-            $PUB_DIR/$APP_NAME-linux-arm64 \
-            $PUB_DIR/$APP_NAME-windows-x64.exe \
-            $PUB_DIR/$APP_NAME-macos-x64 \
-            $PUB_DIR/$APP_NAME-macos-arm64
+      - name: Upload test outcome
+        uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: $PUB_DIR
+          retention-days: 2
